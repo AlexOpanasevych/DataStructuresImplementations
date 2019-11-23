@@ -136,19 +136,3 @@ template <typename T> DynArr<T>::DynArr(const DynArr<T> & rhs) :
 		new (data + sizeof(T) * i) T(rhs.data[i]);
 	}
 }
-
-class Point {
-	int x, y;
-public:
-	Point() {
-		x = 0;
-		y = 0;
-	}
-	Point(int x, int y) {
-		this->x = x;
-		this->y = y;
-	}
-	friend std::ostream & operator << (std::ostream & stream, Point & p) {
-		return stream << '(' << p.x << ' ' << p.y << ')';
-	}
-};
