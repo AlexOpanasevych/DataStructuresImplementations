@@ -10,11 +10,18 @@ template <typename T> class DynArr {
 	size_t _capacity;
 public:
 
+	void resize() {
+		if (_size == _capacity) {
+			std::size_t newCapacity = std::max(2.0, _capacity * 1.5);
+			reserve(newCapacity);
+		}
+	}
+
+	void resize(int newCapacity);
+
 	bool empty() {
 		return _size == 0;
 	}
-
-
 
 	unsigned int size() {
 		return _size;
@@ -41,8 +48,8 @@ public:
 		if (_size > 0)
 		{
 			for (size_t i = 0; i < _size; i++)
-				newData[i] = this->data[i];
-			delete[] this->data;
+				newData[i] = data[i];
+			delete[] data;
 		}
 		newData[_size] = elem;
 		data = newData;
@@ -50,8 +57,14 @@ public:
 	}
 
 	void remove_last() {
-		(reinterpret_cast<T*>(data)[_size - 1]).~T();
-		_size--;
+		(reinterpret_cast<T*>(data)[_size-- - 1]).~T();
+	}
+
+	void swap(DynArr & other) {
+		using std::swap;
+		swap(_capacity, other._capacity);
+		swap(_size, other._size);
+		swap(data, other.data);
 	}
 
 	void remove(int pos) {
@@ -79,15 +92,8 @@ public:
 		}
 	}
 
-	DynArr<T> & operator=(const DynArr <T> & rhs) {
-		delete[] data;
-		_size = rhs._size;
-		_capacity = rhs._capacity;
-		data = new T[_capacity];
-		for (int i = 0; i < _size; i++)
-		{
-			data[i] = rhs.data[i];
-		}
+	DynArr<T> & operator=(const DynArr <T> && rhs) {
+		rhs.swap(*this);
 		return *this;
 	}
 
@@ -126,7 +132,7 @@ template <typename T> DynArr<T>::DynArr() : _size(0), _capacity(10000) {
 	data = new T[_size + 1];
 }
 
-template <typename T> DynArr<T>::DynArr(const DynArr<T> & rhs) :
+template <typename T> DynArr<T>::DynArr(const DynArr<T>& rhs) :
 	_size(rhs._size),
 	_capacity(rhs._capacity),
 	data(new T[rhs._size])
@@ -135,4 +141,4 @@ template <typename T> DynArr<T>::DynArr(const DynArr<T> & rhs) :
 	{
 		new (data + sizeof(T) * i) T(rhs.data[i]);
 	}
-}
+};
