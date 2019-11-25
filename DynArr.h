@@ -3,6 +3,7 @@
 #pragma once
 
 #include <iostream>
+#include <algorithm>
 
 template <typename T> class DynArr {
 	T * data;
@@ -44,6 +45,7 @@ public:
 	}
 
 	void assign(const T & elem) {
+		resize();
 		T * newData = new T[_size + 1];
 		if (_size > 0)
 		{
@@ -101,9 +103,9 @@ public:
 		return at(i);
 	}
 
-	explicit DynArr(const int reserve_size) : _size(reserve_size), data(new T[reserve_size]), _capacity(2 * reserve_size) {}
+	explicit DynArr(const int reserve_size) : _size(0), data(new T[reserve_size]), _capacity(reserve_size) {}
 
-	DynArr(const DynArr<T> & rhs);
+	DynArr(const DynArr && rhs);
 
 	friend std::ostream & operator<<(std::ostream & stream, const DynArr<T> & to_print) {
 		try {
@@ -128,17 +130,12 @@ template <typename T> DynArr<T>::~DynArr()
 	delete[] data;
 }
 
-template <typename T> DynArr<T>::DynArr() : _size(0), _capacity(10000) {
-	data = new T[_size + 1];
-}
+template <typename T> DynArr<T>::DynArr() : _size(0), _capacity(10000), data(new T[1]) {}
 
-template <typename T> DynArr<T>::DynArr(const DynArr<T>& rhs) :
-	_size(rhs._size),
-	_capacity(rhs._capacity),
-	data(new T[rhs._size])
+template <typename T> DynArr<T>::DynArr(const DynArr && rhs) :
+	_size(0),
+	_capacity(0),
+	data(nullptr)
 {
-	for (unsigned int i = 0; i < _size; i++)
-	{
-		new (data + sizeof(T) * i) T(rhs.data[i]);
-	}
+	rhs.swap(*this);
 };
